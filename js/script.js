@@ -52,6 +52,23 @@ const init = () => {
     ["民主党","社会民主党","自由党","希望の党","民進党","生活の党"]
   ];
 
+  const COMMITTEE_NORMALIZE = {
+    // 参議院：中点あり/なしの表記ゆれ（同一委員会）
+    "外交・防衛":  "外交防衛",
+    "財政・金融":  "財政金融",
+    "経済・産業":  "経済産業",
+    "文教・科学":  "文教科学",
+    // 衆議院：末尾スペース
+    "決算行政監視 ": "決算行政監視",
+    // 略称（データのノイズ）
+    "議運":        "議院運営",
+    "農水":        "農林水産",
+    "災害特":      "災害対策特別",
+    "倫理選挙特":  "政治倫理の確立及び選挙制度に関する特別",
+  };
+
+  const normalizeCommittee = (name) => COMMITTEE_NORMALIZE[name] || name;
+
   const addCommas = (num) => {
     return String(num).replace( /(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
   }
@@ -273,8 +290,8 @@ const init = () => {
 
         data.gian_summary.map(gian => {
           gian[10].map(keika => {
-            const c1 = getAfterSlash(keika[10]);
-            const c2 = getAfterSlash(keika[19]);
+            const c1 = normalizeCommittee(getAfterSlash(keika[10]));
+            const c2 = normalizeCommittee(getAfterSlash(keika[19]));
             if (c1 !== "") shu[c1] = true;
             if (c2 !== "") san[c2] = true;
           });
@@ -740,11 +757,11 @@ const init = () => {
         if (!matchAnyKaiji(kaijiAny, gian)) hit = false;
         if (!matchSubmitYear(submitYear, gian)) hit = false;
 
-        if (!matchSomeKeika(shugiinCommittee, gian, (k) => getAfterSlash(k[10]))) hit = false;
+        if (!matchSomeKeika(shugiinCommittee, gian, (k) => normalizeCommittee(getAfterSlash(k[10])))) hit = false;
         if (!matchSomeKeika(shugiinShinsa,    gian, (k) => getAfterSlash(k[11]))) hit = false;
         if (!matchSomeKeika(shugiinShingi,    gian, (k) => getAfterSlash(k[12]))) hit = false;
         if (!matchSomeKeika(shugiinTaido,     gian, (k) => k[13])) hit = false;
-        if (!matchSomeKeika(sangiinCommittee, gian, (k) => getAfterSlash(k[19]))) hit = false;
+        if (!matchSomeKeika(sangiinCommittee, gian, (k) => normalizeCommittee(getAfterSlash(k[19])))) hit = false;
         if (!matchSomeKeika(sangiinShinsa,    gian, (k) => getAfterSlash(k[20]))) hit = false;
         if (!matchSomeKeika(sangiinShingi,    gian, (k) => getAfterSlash(k[21]))) hit = false;
         if (!matchSomeKeika(horei,            gian, (k) => k[22])) hit = false;
