@@ -470,6 +470,7 @@ const init = () => {
       if (urlParams.toString() !== '') {
         const getP = (key) => urlParams.get(key) || '';
         if (getP('title')) $("#input-gian-title").val(getP('title'));
+        if (getP('number')) $("#input-gian-number").val(getP('number'));
         if (getP('title-mode') === 'or') $("input[name='title-mode'][value='or']").prop('checked', true);
         if (getP('type')) $("#select-gian-type").val(getP('type'));
         if (getP('status')) $("#select-gian-status").val(getP('status'));
@@ -700,6 +701,7 @@ const init = () => {
       if (type   === "指定なし") type   = "";
       if (status === "指定なし") status = "";
       const title = $("#input-gian-title").val();
+      const gianNumber = $("#input-gian-number").val().trim();
       const submitter = $("#input-gian-submitter").val();
       const submitterParty = $("#input-gian-submitter-party").val();
       const submitterKind = $("#select-submitter-kind").val();
@@ -727,6 +729,7 @@ const init = () => {
 
         hit = matchText(title, gian[3], titleMode);
 
+        if (gianNumber !== '' && gian[2] !== gianNumber) hit = false;
         if (!matchText(submitter, gian[6])) hit = false;
         if (!matchText(submitterParty, gian[7])) hit = false;
         if (!matchSubmitterKind(submitterKind, gian[6])) hit = false;
@@ -785,6 +788,7 @@ const init = () => {
       const qp = new URLSearchParams();
       const setP = (key, val) => { if (val !== '') qp.set(key, val); };
       setP('title', title);
+      setP('number', gianNumber);
       if (titleMode === 'or') qp.set('title-mode', 'or');
       setP('type', $("#select-gian-type").val());
       setP('status', $("#select-gian-status").val());
