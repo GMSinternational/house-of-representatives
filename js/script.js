@@ -465,6 +465,33 @@ const init = () => {
       updateKeywords();
 
       $("#cover").fadeOut();
+
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.toString() !== '') {
+        const getP = (key) => urlParams.get(key) || '';
+        if (getP('title')) $("#input-gian-title").val(getP('title'));
+        if (getP('title-mode') === 'or') $("input[name='title-mode'][value='or']").prop('checked', true);
+        if (getP('type')) $("#select-gian-type").val(getP('type'));
+        if (getP('status')) $("#select-gian-status").val(getP('status'));
+        if (getP('submitter')) $("#input-gian-submitter").val(getP('submitter'));
+        if (getP('submitter-party')) $("#input-gian-submitter-party").val(getP('submitter-party'));
+        if (getP('submitter-kind')) $("#select-submitter-kind").val(getP('submitter-kind'));
+        if (getP('kaiji-submit')) $("#select-kaiji-submit").val(getP('kaiji-submit'));
+        if (getP('submit-year')) $("#select-submit-year").val(getP('submit-year'));
+        if (getP('kaiji-any')) $("#select-kaiji-any").val(getP('kaiji-any'));
+        if (getP('shugiin-committee')) $("#select-shugiin-committee").val(getP('shugiin-committee'));
+        if (getP('shugiin-shinsa')) $("#input-shugiin-shinsa").val(getP('shugiin-shinsa'));
+        if (getP('shugiin-shingi')) $("#input-shugiin-shingi").val(getP('shugiin-shingi'));
+        if (getP('shugiin-taido')) $("#select-shugiin-taido").val(getP('shugiin-taido'));
+        if (getP('party-for')) $("#select-party-for").val(getP('party-for'));
+        if (getP('party-against')) $("#select-party-against").val(getP('party-against'));
+        if (getP('sangiin-committee')) $("#select-sangiin-committee").val(getP('sangiin-committee'));
+        if (getP('sangiin-shinsa')) $("#input-sangiin-shinsa").val(getP('sangiin-shinsa'));
+        if (getP('sangiin-shingi')) $("#input-sangiin-shingi").val(getP('sangiin-shingi'));
+        if (getP('horei')) $("#input-horei").val(getP('horei'));
+        $("#switch").find('.switch-item[code="search"]').trigger('click');
+        $("#form-gian-search").submit();
+      }
     }
 
     const updateData = (updatetime) => {
@@ -754,6 +781,31 @@ const init = () => {
         $("#download-result").text("検索結果（途中経過含め" + keika_results + "件）をCSVでダウンロードする");
       }
 
+
+      const qp = new URLSearchParams();
+      const setP = (key, val) => { if (val !== '') qp.set(key, val); };
+      setP('title', title);
+      if (titleMode === 'or') qp.set('title-mode', 'or');
+      setP('type', $("#select-gian-type").val());
+      setP('status', $("#select-gian-status").val());
+      setP('submitter', submitter);
+      setP('submitter-party', submitterParty);
+      setP('submitter-kind', submitterKind);
+      setP('kaiji-submit', kaijiSubmit);
+      setP('submit-year', submitYear);
+      setP('kaiji-any', kaijiAny);
+      setP('shugiin-committee', shugiinCommittee);
+      setP('shugiin-shinsa', shugiinShinsa);
+      setP('shugiin-shingi', shugiinShingi);
+      setP('shugiin-taido', shugiinTaido);
+      setP('party-for', party_f);
+      setP('party-against', party_a);
+      setP('sangiin-committee', sangiinCommittee);
+      setP('sangiin-shinsa', sangiinShinsa);
+      setP('sangiin-shingi', sangiinShingi);
+      setP('horei', horei);
+      const qs = qp.toString();
+      history.pushState(null, '', qs ? '?' + qs : window.location.pathname);
 
       $("li").on("click", function(){
         showSingleGian($(this).attr("index"));
