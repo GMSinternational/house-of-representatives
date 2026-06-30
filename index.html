@@ -67,14 +67,21 @@
     </section>
     <section id="search-block" class="">
       <h2><div class="icon search"></div>議案検索</h2>
-      <p class="block-description">議案の件名や提出者名、賛成・反対の政党別に議案を検索</p>
+      <p class="block-description">議案の件名、提出者・提出会派、国会回次、衆参両院の付託委員会・審査結果・審議結果・賛否政党、法律番号など、項目別に議案を検索</p>
       <div class="box sn-color"></div>
       <div id="form-block">
         <form id="form-gian-search" action="./">
+
+          <h4 class="form-category">基本情報</h4>
           <div class="control">
             <div class="label">議案名</div>
             <input type="text" id="input-gian-title" placeholder="議案名で検索" />
-            <div class="control-note">検索キーワードの例：<span id="keywords"></span></div>
+            <div class="control-note">
+              検索キーワードの例：<span id="keywords"></span><br />
+              複数キーワードの場合：
+              <label><input type="radio" name="title-mode" value="and" checked /> すべて含む（AND）</label>
+              <label><input type="radio" name="title-mode" value="or" /> いずれか含む（OR）</label>
+            </div>
           </div>
           <div class="control">
             <div class="label">議案の種類</div>
@@ -93,19 +100,105 @@
             <input type="text" id="input-gian-submitter" placeholder="議案の提出者で検索" />
           </div>
           <div class="control">
-            <div class="label">賛成した政党（会派）</div>
+            <div class="label">議案提出会派</div>
+            <input type="text" id="input-gian-submitter-party" placeholder="議案を提出した会派で検索（議員提出法案のみ）" />
+          </div>
+          <div class="control">
+            <div class="label">提出区分（衆法・参法のみ）</div>
+            <select id="select-submitter-kind">
+              <option value="">指定なし</option>
+              <option value="member">議員提出</option>
+              <option value="committee">委員長提出（委員長・調査会長等）</option>
+            </select>
+            <div class="control-note">衆法・参法のうち、議員が提出したものと、委員会・調査会が委員長／会長名で提出したものを区別します。閣法など他の種類には適用されません。</div>
+          </div>
+
+          <h4 class="form-category">国会回次</h4>
+          <div class="control">
+            <div class="label">提出された国会</div>
+            <select id="select-kaiji-submit">
+              <option value="">指定なし</option>
+            </select>
+            <div class="control-note">議案が最初に提出された国会（会期）。</div>
+          </div>
+          <div class="control">
+            <div class="label">提出年（西暦）</div>
+            <select id="select-submit-year">
+              <option value="">指定なし</option>
+            </select>
+            <div class="control-note">衆議院での議案受理日（元号表記）を西暦に変換しています。</div>
+          </div>
+          <div class="control">
+            <div class="label">審議に関わった国会</div>
+            <select id="select-kaiji-any">
+              <option value="">指定なし</option>
+            </select>
+            <div class="control-note">継続審議などで複数の国会にまたがる議案は、いずれの国会でもヒットします。</div>
+          </div>
+
+          <h4 class="form-category">衆議院での審議</h4>
+          <div class="control">
+            <div class="label">衆議院の付託委員会</div>
+            <select id="select-shugiin-committee">
+              <option value="">指定なし</option>
+            </select>
+          </div>
+          <div class="control">
+            <div class="label">衆議院の審査結果</div>
+            <input type="text" id="input-shugiin-shinsa" placeholder="例：可決、否決、継続審査" />
+          </div>
+          <div class="control">
+            <div class="label">衆議院の審議結果</div>
+            <input type="text" id="input-shugiin-shingi" placeholder="例：可決、否決" />
+          </div>
+          <div class="control">
+            <div class="label">衆議院での採決の会派態度</div>
+            <select id="select-shugiin-taido">
+              <option value="">指定なし</option>
+              <option value="全会一致">全会一致</option>
+              <option value="多数">多数（一部会派が反対）</option>
+              <option value="少数">少数（賛成会派が少数）</option>
+            </select>
+            <div class="control-note">衆議院公式データに掲載されている項目のため、参議院については検索できません。</div>
+          </div>
+          <div class="control">
+            <div class="label">衆議院で賛成した政党（会派）</div>
             <select id="select-party-for">
               <option value="">指定なし</option>
             </select>
             <div class="control-note">「指定なし」以外を選ぶと、採決が行われなかった議案はヒットしません。</div>
           </div>
           <div class="control">
-            <div class="label">反対した政党（会派）</div>
+            <div class="label">衆議院で反対した政党（会派）</div>
             <select id="select-party-against">
               <option value="">指定なし</option>
             </select>
             <div class="control-note">「指定なし」以外を選ぶと、採決が行われなかった議案はヒットしません。</div>
           </div>
+
+          <h4 class="form-category">参議院での審議</h4>
+          <div class="control">
+            <div class="label">参議院の付託委員会</div>
+            <select id="select-sangiin-committee">
+              <option value="">指定なし</option>
+            </select>
+          </div>
+          <div class="control">
+            <div class="label">参議院の審査結果</div>
+            <input type="text" id="input-sangiin-shinsa" placeholder="例：可決、否決、継続審査" />
+          </div>
+          <div class="control">
+            <div class="label">参議院の審議結果</div>
+            <input type="text" id="input-sangiin-shingi" placeholder="例：可決、否決" />
+          </div>
+
+          <h4 class="form-category">その他</h4>
+          <div class="control">
+            <div class="label">公布年月日／法律番号</div>
+            <input type="text" id="input-horei" placeholder="例：令和6年、67（法律第67号の場合）" />
+            <div class="control-note">成立して法律として公布された議案が対象です。日付は元号表記、番号は数字のみで検索してください。</div>
+          </div>
+
           <div class="control">
             <button type="submit">検索</button>
           </div>

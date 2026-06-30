@@ -224,6 +224,90 @@ const init = () => {
         });
       }
 
+      const updateSelectBoxKaiji = () => {
+        let kaijiSubmit = {};
+        let kaijiAny = {};
+
+        data.gian_summary.map(gian => {
+          if (gian[1] !== "") kaijiSubmit[gian[1]] = true;
+          gian[10].map(keika => {
+            if (keika[0] !== "") kaijiAny[keika[0]] = true;
+          });
+        });
+
+        const sortDesc = (obj) => {
+          return Object.keys(obj).map(k => parseInt(k, 10)).filter(n => !isNaN(n)).sort((a, b) => b - a);
+        }
+
+        const fill = (select_id, list) => {
+          const $select = $("#" + select_id);
+          list.map(n => {
+            $select.append('<option value="' + n + '">第' + n + '回国会</option>');
+          });
+        }
+
+        fill("select-kaiji-submit", sortDesc(kaijiSubmit));
+        fill("select-kaiji-any", sortDesc(kaijiAny));
+      }
+
+      // 「平成10年 3月 4日」のような元号表記の日付文字列を西暦の年（数値）に変換する
+      const eraToYear = (str) => {
+        if (typeof str !== "string") return null;
+        const ERA_BASE = { "明治": 1867, "大正": 1911, "昭和": 1925, "平成": 1988, "令和": 2018 };
+        const m = str.match(/^(明治|大正|昭和|平成|令和)\s*(\d+|元)年/);
+        if (!m) return null;
+        const n = m[2] === "元" ? 1 : parseInt(m[2], 10);
+        return ERA_BASE[m[1]] + n;
+      }
+
+      // 「日付／委員会名」「日付／結果」のような列から、最後の／以降の値だけを取り出す
+      const getAfterSlash = (str) => {
+        if (typeof str !== "string" || str.indexOf("／") === -1) return "";
+        const parts = str.split("／");
+        return parts[parts.length - 1];
+      }
+
+      const updateSelectBoxCommittees = () => {
+        let shu = {};
+        let san = {};
+
+        data.gian_summary.map(gian => {
+          gian[10].map(keika => {
+            const c1 = getAfterSlash(keika[10]);
+            const c2 = getAfterSlash(keika[19]);
+            if (c1 !== "") shu[c1] = true;
+            if (c2 !== "") san[c2] = true;
+          });
+        });
+
+        const fill = (select_id, obj) => {
+          const $select = $("#" + select_id);
+          Object.keys(obj).sort((a, b) => a.localeCompare(b, "ja")).map(name => {
+            $select.append('<option value="' + name + '">' + name + '委員会</option>');
+          });
+        }
+
+        fill("select-shugiin-committee", shu);
+        fill("select-sangiin-committee", san);
+      }
+
+      const updateSelectBoxSubmitYears = () => {
+        let years = {};
+
+        data.gian_summary.map(gian => {
+          gian[10].map(keika => {
+            // 衆議院議案受理年月日を優先し、無ければ衆議院予備審査議案受理年月日を使う
+            const y = eraToYear(keika[9]) || eraToYear(keika[7]);
+            if (y) years[y] = true;
+          });
+        });
+
+        const $select = $("#select-submit-year");
+        Object.keys(years).map(y => parseInt(y, 10)).sort((a, b) => b - a).map(y => {
+          $select.append('<option value="' + y + '">' + y + '年</option>');
+        });
+      }
+
       const showLatestStatus = () => {
         let statuses = {};
 
@@ -369,6 +453,9 @@ const init = () => {
       updateSelectBox("gian_status", "select-gian-status");
       updateSelectBoxParties("select-party-for");
       updateSelectBoxParties("select-party-against");
+      updateSelectBoxKaiji();
+      updateSelectBoxCommittees();
+      updateSelectBoxSubmitYears();
 
       showLatestStatus();
       showCommittees();
@@ -469,7 +556,7 @@ const init = () => {
 
   const bindEvents = () => {
 
-    const matchText = (input, haystack) => {
+    const matchText = (input, haystack, mode) => {
 
       const unifyString = (str) => {
         let ret = str;
@@ -499,9 +586,14 @@ const init = () => {
         haystack = haystack.replace(d, "");
       });
 
-      const words = input.split(DELIMITER);
-      let match = true;
+      const words = input.split(DELIMITER).filter(w => w !== "");
+      if (words.length === 0) return true;
 
+      if (mode === "or") {
+        return words.some((w) => haystack.indexOf(w) !== -1);
+      }
+
+      let match = true;
       words.map((w) => {
         if (haystack.indexOf(w) === -1) match = false;
       });
@@ -521,7 +613,56 @@ const init = () => {
       return ret;
     }
 
+    // 「日付／委員会名」「日付／結果」のような列から、最後の／以降の値だけを取り出す
+    const getAfterSlash = (str) => {
+      if (typeof str !== "string" || str.indexOf("／") === -1) return "";
+      const parts = str.split("／");
+      return parts[parts.length - 1];
+    }
+
+    // 経過情報（複数の国会回次にまたがりうる）のいずれかの行が条件に一致すればヒットとする
+    const matchSomeKeika = (input, gian, getter) => {
+      if (input === "") return true;
+      return gian[10].some(keika => matchText(input, getter(keika)));
+    }
+
+    // 国会回次（セレクトボックスの値）が、いずれかの経過情報の回次に一致すればヒットとする
+    const matchAnyKaiji = (input, gian) => {
+      if (input === "") return true;
+      return gian[10].some(keika => keika[0] === input);
+    }
+
+    // 議案提出者の表記から、議員提出か委員長（調査会長等）提出かを判定する
+    const matchSubmitterKind = (kind, submitterName) => {
+      if (kind === "") return true;
+      const isCommittee = submitterName.indexOf("委員長") !== -1 || submitterName.indexOf("調査会長") !== -1;
+      const isMember = !isCommittee && (submitterName.slice(-1) === "君" || submitterName.indexOf("君外") !== -1);
+      if (kind === "committee") return isCommittee;
+      if (kind === "member") return isMember;
+      return true;
+    }
+
+    // 「平成10年 3月 4日」のような元号表記の日付文字列を西暦の年（数値）に変換する
+    const eraToYear = (str) => {
+      if (typeof str !== "string") return null;
+      const ERA_BASE = { "明治": 1867, "大正": 1911, "昭和": 1925, "平成": 1988, "令和": 2018 };
+      const m = str.match(/^(明治|大正|昭和|平成|令和)\s*(\d+|元)年/);
+      if (!m) return null;
+      const n = m[2] === "元" ? 1 : parseInt(m[2], 10);
+      return ERA_BASE[m[1]] + n;
+    }
+
+    const matchSubmitYear = (input, gian) => {
+      if (input === "") return true;
+      const target = parseInt(input, 10);
+      return gian[10].some(keika => {
+        const y = eraToYear(keika[9]) || eraToYear(keika[7]);
+        return y === target;
+      });
+    }
+
     $("#form-gian-search").on("submit", function(e){
+
       e.preventDefault();
       $("#ul-gian-list").empty();
 
@@ -533,8 +674,22 @@ const init = () => {
       if (status === "指定なし") status = "";
       const title = $("#input-gian-title").val();
       const submitter = $("#input-gian-submitter").val();
+      const submitterParty = $("#input-gian-submitter-party").val();
+      const submitterKind = $("#select-submitter-kind").val();
       const party_f = $("#select-party-for").val();
       const party_a = $("#select-party-against").val();
+      const kaijiSubmit = $("#select-kaiji-submit").val();
+      const kaijiAny = $("#select-kaiji-any").val();
+      const submitYear = $("#select-submit-year").val();
+      const titleMode = $("input[name='title-mode']:checked").val();
+      const shugiinCommittee = $("#select-shugiin-committee").val();
+      const shugiinShinsa = $("#input-shugiin-shinsa").val();
+      const shugiinShingi = $("#input-shugiin-shingi").val();
+      const shugiinTaido = $("#select-shugiin-taido").val();
+      const sangiinCommittee = $("#select-sangiin-committee").val();
+      const sangiinShinsa = $("#input-sangiin-shinsa").val();
+      const sangiinShingi = $("#input-sangiin-shingi").val();
+      const horei = $("#input-horei").val();
       const MAX_RESULTS = 1000;
       gResults = [];
 
@@ -543,11 +698,26 @@ const init = () => {
 
         let hit = true;
 
-        hit = matchText(title, gian[3]);
+        hit = matchText(title, gian[3], titleMode);
 
         if (!matchText(submitter, gian[6])) hit = false;
+        if (!matchText(submitterParty, gian[7])) hit = false;
+        if (!matchSubmitterKind(submitterKind, gian[6])) hit = false;
         if (gian[0].indexOf(type) === -1) hit = false;
         if (gian[5].indexOf(status) === -1) hit = false;
+
+        if (kaijiSubmit !== "" && gian[1] !== kaijiSubmit) hit = false;
+        if (!matchAnyKaiji(kaijiAny, gian)) hit = false;
+        if (!matchSubmitYear(submitYear, gian)) hit = false;
+
+        if (!matchSomeKeika(shugiinCommittee, gian, (k) => getAfterSlash(k[10]))) hit = false;
+        if (!matchSomeKeika(shugiinShinsa,    gian, (k) => getAfterSlash(k[11]))) hit = false;
+        if (!matchSomeKeika(shugiinShingi,    gian, (k) => getAfterSlash(k[12]))) hit = false;
+        if (!matchSomeKeika(shugiinTaido,     gian, (k) => k[13])) hit = false;
+        if (!matchSomeKeika(sangiinCommittee, gian, (k) => getAfterSlash(k[19]))) hit = false;
+        if (!matchSomeKeika(sangiinShinsa,    gian, (k) => getAfterSlash(k[20]))) hit = false;
+        if (!matchSomeKeika(sangiinShingi,    gian, (k) => getAfterSlash(k[21]))) hit = false;
+        if (!matchSomeKeika(horei,            gian, (k) => k[22])) hit = false;
 
         gian[10].map(keika => {
           if (!matchParty(party_f, keika[14])) hit = false;

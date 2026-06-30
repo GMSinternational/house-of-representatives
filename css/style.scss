@@ -210,6 +210,20 @@ body {
     margin: 0 auto;
 
     #form-block {
+      .form-category {
+        margin-top: 32px;
+        margin-bottom: 0;
+        padding-bottom: 8px;
+        font-size: 15px;
+        font-weight: bold;
+        color: #369;
+        border-bottom: 1px solid #ddd;
+
+        &:first-of-type {
+          margin-top: 0;
+        }
+      }
+
       .control {
         margin-top: 16px;
 
@@ -253,6 +267,16 @@ body {
           font-size: 13px;
           color: #999;
           margin-top: 4px;
+
+          label {
+            margin-right: 12px;
+            white-space: nowrap;
+          }
+
+          input[type="radio"] {
+            margin: 0 4px 0 0;
+            vertical-align: middle;
+          }
         }
       }
 
