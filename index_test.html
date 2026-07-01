@@ -1,0 +1,357 @@
+<!doctype html>
+<html class="no-js" lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1,user-scalable=no">
+  <meta name="format-detection" content="telephone=no">
+  <meta property="og:url" content="https://gmsinternational.github.io/house-of-representatives/" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="国会議案データベース：衆議院 - ガミシ" />
+  <meta property="og:description" content="衆議院の公式ウェブサイトから国会に提出された議案をデータベース化しました。このページではデータの検索やダウンロードができます。" />
+  <meta property="og:image" content="https://gmsinternational.github.io/house-of-representatives/img/image_1200_630.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="stylesheet" href="css/style.min.css"/>
+  <title>国会議案データベース：衆議院 - ガミシ</title>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-BK0JTFDVF7"></script>
+  <script>window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-BK0JTFDVF7');</script>
+</head>
+<body>
+  <div id="cover">
+    <div>
+      <p>データを読み込んでいます…</p>
+      <p>表示されない場合は<br /><a href="./">ページを更新</a>してください。</p>
+    </div>
+  </div>
+  <div id="container">
+    <section id="title-block">
+      <div id="title-inner">
+        <div class="sn-color box"></div>
+        <h3>ガミシ</h3>
+        <h1>国会議案データベース：衆議院</h1>
+        <p>衆議院の公式ウェブサイトから国会に提出された議案をデータベース化しました。このページではデータの検索やダウンロードができます。<a href="https://gmsinternational.github.io/house-of-councillors/" target="_blank">参議院のデータベースはこちら</a></p>
+      </div>
+    </section>
+    <section id="summary-block" class="show">
+      <h2><div class="icon chart"></div>集計情報</h2>
+      <p class="block-description">審議状況、提出種類、付託委員会、政党・会派別の賛否など、項目別の集計データを表示します。</p>
+      <div class="box sn-color"></div>
+      <article>
+        <h4>審議状況</h4>
+        <p>議案ごとの審議状況。途中経過は含まず、それぞれの議案について最新分のみ集計</p>
+        <div class="chart-wrapper" id="summary-chart-status">
+          <div class="inner"></div>
+        </div>
+      </article>
+      <article>
+        <h4>委員会</h4>
+        <p>議案が審議された委員会。「衆議院付託委員会」を集計</p>
+        <div class="chart-wrapper" id="summary-chart-committee">
+          <div class="inner"></div>
+        </div>
+      </article>
+      <article>
+        <h4>提出種類</h4>
+        <p>閣法・衆法・参法など、議案の種類別の件数</p>
+        <div class="chart-wrapper" id="summary-chart-type">
+          <div class="inner"></div>
+        </div>
+      </article>
+      <article>
+        <h4>議案提出者</h4>
+        <p>議案の提出者。内閣、各委員長、国会議員による立法がある。5件以上のみ掲載</p>
+        <div class="chart-wrapper" id="summary-chart-submitter">
+          <div class="inner"></div>
+        </div>
+      </article>
+      <article>
+        <h4>政党別の賛否</h4>
+        <p>議案に対する政党（会派）別の賛成・反対。主な政党をまとめている。たとえば「自由民主党・無所属の会」とあれば「自由民主党」に数えている。</p>
+        <div class="chart-wrapper" id="summary-chart-foragainst">
+          <div class="inner"></div>
+        </div>
+      </article>
+      <div id="parties-block"></div>
+    </section>
+    <section id="search-block" class="">
+      <h2><div class="icon search"></div>議案検索</h2>
+      <p class="block-description">議案名・種類・審議状況・提出区分・提出者・会派、国会回次、衆参両院の付託委員会・審査結果・審議結果・賛否会派、法律番号など、多様な条件で議案を検索できます。</p>
+      <div class="box sn-color"></div>
+      <div id="form-block">
+        <form id="form-gian-search" action="./">
+
+          <h4 class="form-category">基本情報</h4>
+          <div class="control">
+            <div class="label">議案名</div>
+            <input type="text" id="input-gian-title" placeholder="議案名で検索" />
+            <div class="control-note">
+              検索キーワードの例：<span id="keywords"></span><br />
+              複数キーワードの場合：
+              <label><input type="radio" name="title-mode" value="and" checked /> すべて含む（AND）</label>
+              <label><input type="radio" name="title-mode" value="or" /> いずれか含む（OR）</label>
+            </div>
+          </div>
+          <div class="control">
+            <div class="label">議案の種類</div>
+            <select id="select-gian-type">
+              <option value="">指定なし</option>
+            </select>
+          </div>
+          <div class="control">
+            <div class="label">議案番号</div>
+            <span style="white-space:nowrap">第 <input type="text" id="input-gian-session" list="datalist-gian-session" placeholder="例：213" style="width:88px;display:inline-block" /><datalist id="datalist-gian-session"></datalist> 回国会 第 <input type="text" id="input-gian-number" list="datalist-gian-number" placeholder="例：1" style="width:72px;display:inline-block" /><datalist id="datalist-gian-number"></datalist> 号</span>
+            <div class="control-note">種類と組み合わせて絞り込めます（例：第213回国会 閣法第1号なら、種類=閣法、第213回国会、第1号）。</div>
+          </div>
+          <div class="control">
+            <div class="label">議案の審議状況</div>
+            <select id="select-gian-status">
+              <option value="">指定なし</option>
+            </select>
+          </div>
+          <div class="control">
+            <div class="label">提出区分</div>
+            <select id="select-submitter-kind">
+              <option value="">指定なし</option>
+              <option value="cabinet">内閣提出</option>
+              <option value="member">議員提出</option>
+              <option value="committee">委員長提出（委員長・調査会長等）</option>
+            </select>
+            <div class="control-note">閣法は「内閣提出」、衆法・参法は提出者表記から「議員提出」または「委員長提出」を判定します。</div>
+          </div>
+          <div class="control">
+            <div class="label">議案提出者</div>
+            <input type="text" id="input-gian-submitter" placeholder="議案の提出者で検索" />
+          </div>
+          <div class="control">
+            <div class="label">議案提出会派</div>
+            <select id="select-gian-submitter-party">
+              <option value="">指定なし</option>
+            </select>
+          </div>
+
+          <h4 class="form-category">国会回次</h4>
+          <div class="control">
+            <div class="label">提出された国会</div>
+            <select id="select-kaiji-submit">
+              <option value="">指定なし</option>
+            </select>
+            <div class="control-note">議案が最初に提出された国会（会期）。</div>
+          </div>
+          <div class="control">
+            <div class="label">提出年（西暦）</div>
+            <select id="select-submit-year">
+              <option value="">指定なし</option>
+            </select>
+            <div class="control-note">衆議院での議案受理日（元号表記）を西暦に変換しています。</div>
+          </div>
+          <div class="control">
+            <div class="label">審議に関わった国会</div>
+            <select id="select-kaiji-any">
+              <option value="">指定なし</option>
+            </select>
+            <div class="control-note">継続審議などで複数の国会にまたがる議案は、いずれの国会でもヒットします。</div>
+          </div>
+          <div class="control">
+            <div class="label">審議に関わった年（西暦）</div>
+            <select id="select-kaiji-any-year">
+              <option value="">指定なし</option>
+            </select>
+          </div>
+
+          <h4 class="form-category">衆議院での審議</h4>
+          <div class="control">
+            <div class="label">衆議院の付託委員会</div>
+            <select id="select-shugiin-committee">
+              <option value="">指定なし</option>
+            </select>
+          </div>
+          <div class="control">
+            <div class="label">衆議院の審査結果</div>
+            <select id="select-shugiin-shinsa">
+              <option value="">指定なし</option>
+              <optgroup label="可決・承認">
+                <option>可決</option><option>修正</option><option>併合修正</option>
+                <option>承認</option><option>承諾</option><option>是認</option>
+                <option>異議がない</option><option>一部批難</option><option>議決不要</option>
+                <option>中央労働委員会の裁定のとおり実施することを承認</option>
+              </optgroup>
+              <optgroup label="継続・未了">
+                <option>審査未了</option>
+              </optgroup>
+              <optgroup label="否決・廃案">
+                <option>否決</option><option>撤回許可</option><option>撤回</option>
+              </optgroup>
+            </select>
+          </div>
+          <div class="control">
+            <div class="label">衆議院の審議結果</div>
+            <select id="select-shugiin-shingi">
+              <option value="">指定なし</option>
+              <optgroup label="可決・承認">
+                <option>可決</option><option>修正</option><option>併合修正</option>
+                <option>承認</option><option>承諾</option><option>議決</option>
+                <option>議決不要</option><option>是認</option><option>異議がない</option>
+                <option>同意</option><option>中央労働委員会の裁定のとおり実施することを承認</option>
+              </optgroup>
+              <optgroup label="継続・未了">
+                <option>閉会中審査</option><option>審議未了</option>
+                <option>未決</option><option>（中間報告聴取）</option>
+              </optgroup>
+              <optgroup label="否決・廃案">
+                <option>否決</option><option>不同意</option><option>撤回承諾</option>
+                <option>撤回許可</option>
+                <option>両院協議会協議委員議長から両院の意見が一致しない旨の報告</option>
+              </optgroup>
+            </select>
+          </div>
+          <div class="control">
+            <div class="label">衆議院での採決の会派態度</div>
+            <select id="select-shugiin-taido">
+              <option value="">指定なし</option>
+              <option value="全会一致">全会一致</option>
+              <option value="多数">多数（一部会派が反対）</option>
+              <option value="少数">少数（賛成会派が少数）</option>
+            </select>
+            <div class="control-note">衆議院公式データに掲載されている項目のため、参議院については検索できません。</div>
+          </div>
+          <div class="control">
+            <div class="label">衆議院で賛成した会派（政党）</div>
+            <select id="select-party-for">
+              <option value="">指定なし</option>
+            </select>
+            <div class="control-note">「指定なし」以外を選ぶと、採決が行われなかった議案はヒットしません。</div>
+          </div>
+          <div class="control">
+            <div class="label">衆議院で反対した会派（政党）</div>
+            <select id="select-party-against">
+              <option value="">指定なし</option>
+            </select>
+            <div class="control-note">「指定なし」以外を選ぶと、採決が行われなかった議案はヒットしません。</div>
+          </div>
+
+          <h4 class="form-category">参議院での審議</h4>
+          <div class="control">
+            <div class="label">参議院の付託委員会</div>
+            <select id="select-sangiin-committee">
+              <option value="">指定なし</option>
+            </select>
+          </div>
+          <div class="control">
+            <div class="label">参議院の審査結果</div>
+            <select id="select-sangiin-shinsa">
+              <option value="">指定なし</option>
+              <optgroup label="可決・承認">
+                <option>可決</option><option>修正</option><option>承認</option>
+                <option>承諾</option>
+                <option>中央労働委員会の裁定のとおり実施することを承認</option>
+              </optgroup>
+              <optgroup label="継続・未了">
+                <option>審査未了</option>
+              </optgroup>
+              <optgroup label="否決・廃案">
+                <option>否決</option><option>不承諾</option><option>不承認</option>
+                <option>撤回許可</option><option>撤回</option>
+              </optgroup>
+            </select>
+          </div>
+          <div class="control">
+            <div class="label">参議院の審議結果</div>
+            <select id="select-sangiin-shingi">
+              <option value="">指定なし</option>
+              <optgroup label="可決・承認">
+                <option>可決</option><option>修正</option><option>承認</option>
+                <option>承諾</option><option>同意</option><option>議決不要</option>
+                <option>中央労働委員会の裁定のとおり実施することを承認</option>
+              </optgroup>
+              <optgroup label="継続・未了">
+                <option>閉会中審査</option><option>省略決定</option>
+                <option>審議未了</option><option>（中間報告聴取）</option>
+              </optgroup>
+              <optgroup label="否決・廃案">
+                <option>否決</option><option>不承諾</option><option>不承認</option>
+                <option>不同意</option><option>撤回</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <h4 class="form-category">その他</h4>
+          <div class="control">
+            <div class="label">公布年</div>
+            <select id="select-horei-year">
+              <option value="">指定なし</option>
+            </select>
+            <div class="control-note">成立して法律として公布された議案が対象です。</div>
+          </div>
+          <div class="control">
+            <div class="label">法律番号</div>
+            <input type="text" id="input-horei-number" list="datalist-horei-number" placeholder="例：67" style="width:100px" />
+            <datalist id="datalist-horei-number"></datalist>
+            <div class="control-note">法律番号（数字）で検索します。例：法律第67号なら「67」。</div>
+          </div>
+
+          <div class="control">
+            <button type="submit">検索</button>
+          </div>
+        </form>
+        <div class="sn-color box"></div>
+      </div>
+      <div id="result-block">
+        <p id="result-number"></p>
+        <a href="" id="download-result"></a>
+        <ul id="ul-gian-list"></ul>
+      </div>
+      <div id="single-gian-block">
+  			<div id="single-gian-cover"></div>
+  			<div id="single-gian-content">
+          <button id="single-gian-button-close"></button>
+          <div id="single-gian-content-inner">
+            <h3></h3>
+            <ul id="ul-single-gian-items"></ul>
+            <div id="single-gian-content-keika"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section id="switch-block">
+      <div id="switch">
+				<div class="switch-item selected" code="summary">集計情報</div>
+				<div class="switch-item" code="search">議案検索</div>
+			</div>
+    </section>
+    <section id="parties-note-block">
+    </section>
+    <section id="footer-block">
+      <h2><div class="icon info"></div>このページについて</h2>
+      <div class="box sn-color"></div>
+      <p>衆議院「<a href="https://www.shugiin.go.jp/internet/itdb_gian.nsf/html/gian/menu.htm" target="_blank">議案情報</a>」ページから、国会に提出された議案をデータベース化したものです。</p>
+      <p>「集計情報」では成立した/撤回された議案の数、議案を提出した国会議員、政党別の議案への賛否などの集計を見ることができます。</p>
+      <p>また「議案検索」では議案の件名や提出者、賛成・反対した政党名などから議案を検索できます。検索結果だけを選んでダウンロードすることも可能です。</p>
+      <p>すべてのデータとソースコードは<a href="https://github.com/gmsinternational/house-of-representatives" target="_blank">GitHub</a>で公開しており、自由に閲覧・ダウンロードが可能です。</p>
+      <p>GitHubプロジェクトのライセンスはMITライセンスとしています。商用・非商用を問わずご自由にお使いいただけます。</p>
+      <p>データやソースコードを引用する際の著作権表記は「ガミシ」または「gamishi」としてください。</p>
+      <p>なお、本プロジェクトの利用によって生じたいかなる損害についても、開発者は一切責任を負いません。</p>
+      <div class="box-2 sn-color"></div>
+      <div id="social-buttons">
+        <div class="social-button">
+          <a class="copy" href="" id="social-button-copy"></a>
+          <div class="text-copy"></div>
+        </div>
+        <div class="social-button">
+          <a class="line" target="_blank" href="https://line.me/R/msg/text/?%E5%9B%BD%E4%BC%9A%E8%AD%B0%E6%A1%88%E3%83%87%E3%83%BC%E3%82%BF%E3%83%99%E3%83%BC%E3%82%B9%20-%20%E3%82%AC%E3%83%9F%E3%82%B7%20https%3A%2F%2Fgmsinternational.github.io%2Fhouse-of-representatives%2F"></a>
+          <div>LINE</div>
+        </div>
+        <div class="social-button">
+          <a class="facebook" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fgmsinternational.github.io%2Fhouse-of-representatives%2F"></a>
+          <div>Facebook</div>
+        </div>
+        <div class="social-button">
+          <a class="twitter" target="_blank" href="https://twitter.com/share?url=https%3A%2F%2Fgmsinternational.github.io%2Fhouse-of-representatives%2F&text=%E5%9B%BD%E4%BC%9A%E8%AD%B0%E6%A1%88%E3%83%87%E3%83%BC%E3%82%BF%E3%83%99%E3%83%BC%E3%82%B9%20-%20%E3%82%AC%E3%83%9F%E3%82%B7%0D%0A"></a>
+          <div>Twitter</div>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script src="node_modules/jquery/dist/jquery.min.js"></script>
+  <script src="node_modules/echarts/dist/echarts.common.min.js"></script>
+  <script src="js/script.min.js"></script>
+</body>
+</html>
