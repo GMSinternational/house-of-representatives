@@ -4,6 +4,9 @@
 
 $mobile-max-width: 428px;
 
+$color-primary: #1a3a5c;
+$color-accent:  #2799b0;
+
 
 
 
@@ -57,10 +60,10 @@ body {
       @keyframes shadow {
       	0%,
       	100% {
-          box-shadow: 0px 0px 4px #03fccf;
+          box-shadow: 0px 0px 6px $color-accent;
       	}
       	50% {
-          box-shadow: 0px 0px 4px #98b5ac;
+          box-shadow: 0px 0px 4px rgba(39, 153, 176, 0.3);
       	}
       }
     }
@@ -75,7 +78,7 @@ body {
   }
 
   .sn-color {
-    background: linear-gradient(90deg,#ff645b,#ff645b 25%,#ffc73d 0,#ffc73d 50%,#54e470 0,#54e470 75%,#0fbbe7 0,#0fbbe7);
+    background: linear-gradient(90deg, $color-primary, $color-accent);
   }
 
   h2 {
@@ -150,8 +153,7 @@ body {
 
   #title-block {
     width: 100%;
-    //background: linear-gradient(220.55deg, #FF3F3F 0%, #063CFF 100%);
-    background-color: #fefefe;
+    background: linear-gradient(135deg, $color-primary 0%, #1e5a80 100%);
 
     #title-inner {
       width: calc(100% - 32px);
@@ -163,14 +165,14 @@ body {
         margin: 0;
         margin-top: 8px;
         font-size: 15px;
-        color: #999;
+        color: rgba(255,255,255,0.6);
       }
 
       h1 {
         margin-top: 8px;
         font-size: 24px;
         font-weight: bold;
-        color: #222;
+        color: #fff;
 
         @media only screen and (min-width: 400px) {
           font-size: 26px;
@@ -191,7 +193,12 @@ body {
         margin-top: 8px;
         font-size: 14px;
         line-height: 26px;
-        color: #666;
+        color: rgba(255,255,255,0.8);
+
+        a {
+          color: #90d8f0;
+          text-decoration: underline;
+        }
 
         @media only screen and (min-width: 400px) {
           font-size: 15px;
@@ -216,7 +223,7 @@ body {
         padding-bottom: 8px;
         font-size: 15px;
         font-weight: bold;
-        color: #369;
+        color: $color-primary;
         border-bottom: 1px solid #ddd;
 
         &:first-of-type {
@@ -242,7 +249,7 @@ body {
           width: 108px;
           height: 36px;
           color: #fefefe;
-          background-color: #369;
+          background-color: $color-primary;
           background-image: url(../img/material-icon-search-white.svg);
           background-position: 16px calc(50% + 1px);
           background-size: 24px;
@@ -312,10 +319,10 @@ body {
 
           div:nth-child(1) {
             font-size: 13px;
-            color: #932;
+            color: #555;
 
             span {
-              color: #369;
+              color: $color-accent;
             }
           }
 
@@ -338,7 +345,7 @@ body {
           }
 
           &:hover {
-            background-color: #fefef6;
+            background-color: #f0f5fa;
             cursor: pointer;
           }
         }
@@ -529,7 +536,7 @@ body {
         }
 
         &.selected {
-          background-color: #a32;
+          background-color: $color-primary;
           color: #fefefe;
 
           &:nth-child(1) {
@@ -577,18 +584,6 @@ body {
       margin-bottom: 8px;
     }
 
-    a.logo {
-      display: block;
-      width: 240px;
-      height: 30px;
-      margin: 0 auto;
-      margin-top: 32px;
-      background-image: url(../img/smri-logo.svg);
-      background-size: cover;
-      background-position: center center;
-      background-repeat: no-repeat;
-    }
-
     #social-buttons {
       width: fit-content;
       margin: 64px auto 64px auto;
@@ -629,7 +624,7 @@ body {
             }
 
             &.copied {
-              color: #a32;
+              color: $color-primary;
 
               &:before {
                 content: "Copied!";
