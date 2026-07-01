@@ -534,8 +534,8 @@ const init = () => {
       });
     }
 
-    if (localStorage.getItem('smri-gian')) {
-      data = localStorage.getItem('smri-gian');
+    if (localStorage.getItem('gamishi-gian')) {
+      data = localStorage.getItem('gamishi-gian');
       $.getJSON("data/updatetime.json", function(updatetime){
         let t1 = new Date(updatetime.file_update);
         let t2 = new Date(data.updatetime.file_update);
@@ -884,7 +884,7 @@ const init = () => {
       const n = now.getMinutes();
       const s = now.getSeconds();
       const data = getResultsToArray();
-      const filename = "smri-house-of-representatives-" + y + m + d + h + n + s + ".csv";
+      const filename = "gamishi-house-of-representatives-" + y + m + d + h + n + s + ".csv";
       const bom = new Uint8Array([0xef, 0xbb, 0xbf]);
       const blob = new Blob([bom, data], {type: "text/csv"});
 
@@ -902,7 +902,7 @@ const init = () => {
 
     $("#social-button-copy").on("click", function(e){
       e.preventDefault();
-      let text = "国会議案データベース - スマートニュース メディア研究所\nhttps://smartnews-smri.github.io/house-of-representatives/";
+      let text = "国会議案データベース - ガミシ\nhttps://gmsinternational.github.io/house-of-representatives/";
       let $textarea = $('<textarea></textarea>');
       $textarea.text(text);
       $(this).append($textarea);
