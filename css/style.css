@@ -464,6 +464,11 @@ body .block-description {
 #container #summary-block.show, #container #search-block.show {
   display: block;
 }
+#container #parties-note-block {
+  width: calc(100% - 32px);
+  max-width: 960px;
+  margin: 64px auto 0;
+}
 #container #footer-block {
   margin: 0 auto;
   margin-top: 64px;
