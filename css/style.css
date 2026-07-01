@@ -46,10 +46,10 @@ body input:focus, body textarea:focus, body select:focus {
 }
 @keyframes shadow {
   0%, 100% {
-    box-shadow: 0px 0px 4px #03fccf;
+    box-shadow: 0px 0px 6px #2799b0;
   }
   50% {
-    box-shadow: 0px 0px 4px #98b5ac;
+    box-shadow: 0px 0px 4px rgba(39, 153, 176, 0.3);
   }
 }
 body select {
@@ -60,7 +60,7 @@ body select {
   padding: 8px 48px 8px 20px;
 }
 body .sn-color {
-  background: linear-gradient(90deg, #ff645b, #ff645b 25%, #ffc73d 0, #ffc73d 50%, #54e470 0, #54e470 75%, #0fbbe7 0, #0fbbe7);
+  background: linear-gradient(90deg, #1a3a5c, #2799b0);
 }
 body h2 {
   margin-top: 32px;
@@ -131,7 +131,7 @@ body .block-description {
 }
 #container #title-block {
   width: 100%;
-  background-color: #fefefe;
+  background: linear-gradient(135deg, #1a3a5c 0%, #1e5a80 100%);
 }
 #container #title-block #title-inner {
   width: calc(100% - 32px);
@@ -143,13 +143,13 @@ body .block-description {
   margin: 0;
   margin-top: 8px;
   font-size: 15px;
-  color: #999;
+  color: rgba(255, 255, 255, 0.6);
 }
 #container #title-block #title-inner h1 {
   margin-top: 8px;
   font-size: 24px;
   font-weight: bold;
-  color: #222;
+  color: #fff;
 }
 @media only screen and (min-width: 400px) {
   #container #title-block #title-inner h1 {
@@ -170,7 +170,11 @@ body .block-description {
   margin-top: 8px;
   font-size: 14px;
   line-height: 26px;
-  color: #666;
+  color: rgba(255, 255, 255, 0.8);
+}
+#container #title-block #title-inner p a {
+  color: #90d8f0;
+  text-decoration: underline;
 }
 @media only screen and (min-width: 400px) {
   #container #title-block #title-inner p {
@@ -193,7 +197,7 @@ body .block-description {
   padding-bottom: 8px;
   font-size: 15px;
   font-weight: bold;
-  color: #369;
+  color: #1a3a5c;
   border-bottom: 1px solid #ddd;
 }
 #container #search-block #form-block .form-category:first-of-type {
@@ -215,7 +219,7 @@ body .block-description {
   width: 108px;
   height: 36px;
   color: #fefefe;
-  background-color: #369;
+  background-color: #1a3a5c;
   background-image: url(../img/material-icon-search-white.svg);
   background-position: 16px calc(50% + 1px);
   background-size: 24px;
@@ -274,10 +278,10 @@ body .block-description {
 }
 #container #search-block #result-block #ul-gian-list li div:nth-child(1) {
   font-size: 13px;
-  color: #932;
+  color: #555;
 }
 #container #search-block #result-block #ul-gian-list li div:nth-child(1) span {
-  color: #369;
+  color: #2799b0;
 }
 #container #search-block #result-block #ul-gian-list li div:nth-child(2) {
   margin-top: 4px;
@@ -295,7 +299,7 @@ body .block-description {
   border-bottom: 1px solid #ddd;
 }
 #container #search-block #result-block #ul-gian-list li:hover {
-  background-color: #fefef6;
+  background-color: #f0f5fa;
   cursor: pointer;
 }
 #container #search-block #single-gian-block #single-gian-cover {
@@ -445,7 +449,7 @@ body .block-description {
   background-color: rgba(0, 0, 0, 0.1);
 }
 #container #switch-block #switch .switch-item.selected {
-  background-color: #a32;
+  background-color: #1a3a5c;
   color: #fefefe;
 }
 #container #switch-block #switch .switch-item.selected:nth-child(1) {
@@ -481,17 +485,6 @@ body .block-description {
   font-size: 14px;
   color: #666;
   margin-bottom: 8px;
-}
-#container #footer-block a.logo {
-  display: block;
-  width: 240px;
-  height: 30px;
-  margin: 0 auto;
-  margin-top: 32px;
-  background-image: url(../img/smri-logo.svg);
-  background-size: cover;
-  background-position: center center;
-  background-repeat: no-repeat;
 }
 #container #footer-block #social-buttons {
   width: fit-content;
@@ -536,7 +529,7 @@ body .block-description {
   content: "Copy";
 }
 #container #footer-block #social-buttons .social-button div.text-copy.copied {
-  color: #a32;
+  color: #1a3a5c;
 }
 #container #footer-block #social-buttons .social-button div.text-copy.copied:before {
   content: "Copied!";
