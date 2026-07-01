@@ -52,6 +52,23 @@ const init = () => {
     ["民主党","社会民主党","自由党","希望の党","民進党","生活の党"]
   ];
 
+  const COMMITTEE_NORMALIZE = {
+    // 参議院：中点あり/なしの表記ゆれ（同一委員会）
+    "外交・防衛":  "外交防衛",
+    "財政・金融":  "財政金融",
+    "経済・産業":  "経済産業",
+    "文教・科学":  "文教科学",
+    // 衆議院：末尾スペース
+    "決算行政監視 ": "決算行政監視",
+    // 略称（データのノイズ）
+    "議運":        "議院運営",
+    "農水":        "農林水産",
+    "災害特":      "災害対策特別",
+    "倫理選挙特":  "政治倫理の確立及び選挙制度に関する特別",
+  };
+
+  const normalizeCommittee = (name) => COMMITTEE_NORMALIZE[name] || name;
+
   const addCommas = (num) => {
     return String(num).replace( /(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
   }
@@ -273,8 +290,8 @@ const init = () => {
 
         data.gian_summary.map(gian => {
           gian[10].map(keika => {
-            const c1 = getAfterSlash(keika[10]);
-            const c2 = getAfterSlash(keika[19]);
+            const c1 = normalizeCommittee(getAfterSlash(keika[10]));
+            const c2 = normalizeCommittee(getAfterSlash(keika[19]));
             if (c1 !== "") shu[c1] = true;
             if (c2 !== "") san[c2] = true;
           });
@@ -465,6 +482,34 @@ const init = () => {
       updateKeywords();
 
       $("#cover").fadeOut();
+
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.toString() !== '') {
+        const getP = (key) => urlParams.get(key) || '';
+        if (getP('title')) $("#input-gian-title").val(getP('title'));
+        if (getP('number')) $("#input-gian-number").val(getP('number'));
+        if (getP('title-mode') === 'or') $("input[name='title-mode'][value='or']").prop('checked', true);
+        if (getP('type')) $("#select-gian-type").val(getP('type'));
+        if (getP('status')) $("#select-gian-status").val(getP('status'));
+        if (getP('submitter')) $("#input-gian-submitter").val(getP('submitter'));
+        if (getP('submitter-party')) $("#input-gian-submitter-party").val(getP('submitter-party'));
+        if (getP('submitter-kind')) $("#select-submitter-kind").val(getP('submitter-kind'));
+        if (getP('kaiji-submit')) $("#select-kaiji-submit").val(getP('kaiji-submit'));
+        if (getP('submit-year')) $("#select-submit-year").val(getP('submit-year'));
+        if (getP('kaiji-any')) $("#select-kaiji-any").val(getP('kaiji-any'));
+        if (getP('shugiin-committee')) $("#select-shugiin-committee").val(getP('shugiin-committee'));
+        if (getP('shugiin-shinsa')) $("#input-shugiin-shinsa").val(getP('shugiin-shinsa'));
+        if (getP('shugiin-shingi')) $("#input-shugiin-shingi").val(getP('shugiin-shingi'));
+        if (getP('shugiin-taido')) $("#select-shugiin-taido").val(getP('shugiin-taido'));
+        if (getP('party-for')) $("#select-party-for").val(getP('party-for'));
+        if (getP('party-against')) $("#select-party-against").val(getP('party-against'));
+        if (getP('sangiin-committee')) $("#select-sangiin-committee").val(getP('sangiin-committee'));
+        if (getP('sangiin-shinsa')) $("#input-sangiin-shinsa").val(getP('sangiin-shinsa'));
+        if (getP('sangiin-shingi')) $("#input-sangiin-shingi").val(getP('sangiin-shingi'));
+        if (getP('horei')) $("#input-horei").val(getP('horei'));
+        $("#switch").find('.switch-item[code="search"]').trigger('click');
+        $("#form-gian-search").submit();
+      }
     }
 
     const updateData = (updatetime) => {
@@ -489,8 +534,8 @@ const init = () => {
       });
     }
 
-    if (localStorage.getItem('smri-gian')) {
-      data = localStorage.getItem('smri-gian');
+    if (localStorage.getItem('gamishi-gian')) {
+      data = localStorage.getItem('gamishi-gian');
       $.getJSON("data/updatetime.json", function(updatetime){
         let t1 = new Date(updatetime.file_update);
         let t2 = new Date(data.updatetime.file_update);
@@ -673,6 +718,7 @@ const init = () => {
       if (type   === "指定なし") type   = "";
       if (status === "指定なし") status = "";
       const title = $("#input-gian-title").val();
+      const gianNumber = $("#input-gian-number").val().trim();
       const submitter = $("#input-gian-submitter").val();
       const submitterParty = $("#input-gian-submitter-party").val();
       const submitterKind = $("#select-submitter-kind").val();
@@ -700,6 +746,7 @@ const init = () => {
 
         hit = matchText(title, gian[3], titleMode);
 
+        if (gianNumber !== '' && gian[2] !== gianNumber) hit = false;
         if (!matchText(submitter, gian[6])) hit = false;
         if (!matchText(submitterParty, gian[7])) hit = false;
         if (!matchSubmitterKind(submitterKind, gian[6])) hit = false;
@@ -710,11 +757,11 @@ const init = () => {
         if (!matchAnyKaiji(kaijiAny, gian)) hit = false;
         if (!matchSubmitYear(submitYear, gian)) hit = false;
 
-        if (!matchSomeKeika(shugiinCommittee, gian, (k) => getAfterSlash(k[10]))) hit = false;
+        if (!matchSomeKeika(shugiinCommittee, gian, (k) => normalizeCommittee(getAfterSlash(k[10])))) hit = false;
         if (!matchSomeKeika(shugiinShinsa,    gian, (k) => getAfterSlash(k[11]))) hit = false;
         if (!matchSomeKeika(shugiinShingi,    gian, (k) => getAfterSlash(k[12]))) hit = false;
         if (!matchSomeKeika(shugiinTaido,     gian, (k) => k[13])) hit = false;
-        if (!matchSomeKeika(sangiinCommittee, gian, (k) => getAfterSlash(k[19]))) hit = false;
+        if (!matchSomeKeika(sangiinCommittee, gian, (k) => normalizeCommittee(getAfterSlash(k[19])))) hit = false;
         if (!matchSomeKeika(sangiinShinsa,    gian, (k) => getAfterSlash(k[20]))) hit = false;
         if (!matchSomeKeika(sangiinShingi,    gian, (k) => getAfterSlash(k[21]))) hit = false;
         if (!matchSomeKeika(horei,            gian, (k) => k[22])) hit = false;
@@ -754,6 +801,32 @@ const init = () => {
         $("#download-result").text("検索結果（途中経過含め" + keika_results + "件）をCSVでダウンロードする");
       }
 
+
+      const qp = new URLSearchParams();
+      const setP = (key, val) => { if (val !== '') qp.set(key, val); };
+      setP('title', title);
+      setP('number', gianNumber);
+      if (titleMode === 'or') qp.set('title-mode', 'or');
+      setP('type', $("#select-gian-type").val());
+      setP('status', $("#select-gian-status").val());
+      setP('submitter', submitter);
+      setP('submitter-party', submitterParty);
+      setP('submitter-kind', submitterKind);
+      setP('kaiji-submit', kaijiSubmit);
+      setP('submit-year', submitYear);
+      setP('kaiji-any', kaijiAny);
+      setP('shugiin-committee', shugiinCommittee);
+      setP('shugiin-shinsa', shugiinShinsa);
+      setP('shugiin-shingi', shugiinShingi);
+      setP('shugiin-taido', shugiinTaido);
+      setP('party-for', party_f);
+      setP('party-against', party_a);
+      setP('sangiin-committee', sangiinCommittee);
+      setP('sangiin-shinsa', sangiinShinsa);
+      setP('sangiin-shingi', sangiinShingi);
+      setP('horei', horei);
+      const qs = qp.toString();
+      history.pushState(null, '', qs ? '?' + qs : window.location.pathname);
 
       $("li").on("click", function(){
         showSingleGian($(this).attr("index"));
@@ -811,7 +884,7 @@ const init = () => {
       const n = now.getMinutes();
       const s = now.getSeconds();
       const data = getResultsToArray();
-      const filename = "smri-house-of-representatives-" + y + m + d + h + n + s + ".csv";
+      const filename = "gamishi-house-of-representatives-" + y + m + d + h + n + s + ".csv";
       const bom = new Uint8Array([0xef, 0xbb, 0xbf]);
       const blob = new Blob([bom, data], {type: "text/csv"});
 
@@ -829,7 +902,7 @@ const init = () => {
 
     $("#social-button-copy").on("click", function(e){
       e.preventDefault();
-      let text = "国会議案データベース - スマートニュース メディア研究所\nhttps://smartnews-smri.github.io/house-of-representatives/";
+      let text = "国会議案データベース - ガミシ\nhttps://gmsinternational.github.io/house-of-representatives/";
       let $textarea = $('<textarea></textarea>');
       $textarea.text(text);
       $(this).append($textarea);
