@@ -228,6 +228,12 @@ const init = () => {
         }
       }
 
+      const CURRENT_PARTIES = new Set([
+        "れいわ新選組","チームみらい","中道改革連合・無所属","公明党","参政党",
+        "国民民主党・無所属クラブ","日本共産党","日本維新の会","有志の会",
+        "自由民主党","自由民主党・無所属の会","社会民主党・市民連合"
+      ]);
+
       const updateSelectBoxParties = (select_id) => {
         const $select = $("#" + select_id);
         const all = {};
@@ -242,9 +248,17 @@ const init = () => {
             });
           });
         });
-        Object.keys(all).sort((a, b) => a.localeCompare(b, "ja")).forEach(name => {
-          $select.append('<option value="' + name + '">' + name + '</option>');
-        });
+        const sorted = Object.keys(all).sort((a, b) => a.localeCompare(b, "ja"));
+        const current = sorted.filter(p => CURRENT_PARTIES.has(p));
+        const historical = sorted.filter(p => !CURRENT_PARTIES.has(p));
+        if (current.length) {
+          $select.append('<optgroup label="現在の会派"></optgroup>');
+          current.forEach(name => $select.find("optgroup:last").append('<option value="' + name + '">' + name + '</option>'));
+        }
+        if (historical.length) {
+          $select.append('<optgroup label="過去の会派"></optgroup>');
+          historical.forEach(name => $select.find("optgroup:last").append('<option value="' + name + '">' + name + '</option>'));
+        }
       }
 
       const updateSelectBoxStatuses = () => {
@@ -527,41 +541,137 @@ const init = () => {
       }
 
       const showPartiesNote = () => {
-        const all = new Set();
-        data.gian_summary.forEach(gian => {
-          gian[10].forEach(keika => {
-            [keika[14], keika[15]].forEach(field => {
-              if (!field) return;
-              field.split(/;\s?/).forEach(p => {
-                p = p.trim();
-                if (p && p.indexOf("・") !== -1) all.add(p);
-              });
-            });
-          });
-        });
-        const names = Array.from(all).sort((a, b) => a.localeCompare(b, "ja"));
-        if (names.length === 0) return;
+        const COMPOSITE_INFO = {
+          "中道改革連合・無所属":          "立憲民主党・公明党出身議員＋無所属（2026年結成）",
+          "国民民主党・無所属クラブ":       "国民民主党＋無所属議員",
+          "希望の党・無所属クラブ":         "希望の党＋無所属議員（消滅：2018年）",
+          "日本維新の会・教育無償化を実現する会": "日本維新の会＋教育無償化を実現する会（消滅：2024年）",
+          "日本維新の会・無所属の会":       "日本維新の会＋無所属議員（消滅）",
+          "民主・維新・無所属クラブ":       "民主党＋維新の党＋無所属（消滅：2016年）",
+          "民主党・無所属クラブ":           "民主党＋無所属議員（消滅：2016年）",
+          "民進党・無所属クラブ":           "民進党＋無所属議員（消滅：2017年）",
+          "社会民主党・市民連合":           "社会民主党＋市民連合系（現存・微小）",
+          "立憲民主・国民・社保・無所属フォーラム": "立憲民主党＋国民民主党＋社会保障を立て直す国民会議＋社民＋無所属（消滅：2020年）",
+          "立憲民主党・市民クラブ":         "立憲民主党＋無所属（消滅：2019年）",
+          "立憲民主党・無所属":             "立憲民主党＋無所属（消滅：2026年）",
+          "立憲民主党・無所属フォーラム":   "立憲民主党＋無所属（消滅：2020年）",
+          "立憲民主党・社民・無所属":       "立憲民主党＋社会民主党＋無所属（消滅：2021年）",
+          "自由民主党・無所属の会":         "自由民主党＋無所属議員（現存）",
+          "生活の党と山本太郎となかまたち": "生活の党（小沢一郎グループ）＋山本太郎（消滅：2016年→自由党）",
+        };
+        const DEFUNCT_SINGLE = [
+          "おおさか維新の会（→日本維新の会に改称、2016年）",
+          "みんなの党（2014年解党）",
+          "改革の会（2025年解散）",
+          "改革結集の会（2016年民進党に合流）",
+          "希望の党（2021年解党）",
+          "次世代の党（→日本のこころ→自民党合流）",
+          "日本保守党（2026年選挙で議席喪失）",
+          "未来日本（2019年解散）",
+          "無所属の会（2019年解散）",
+          "生活の党（→生活の党と山本太郎となかまたち）",
+          "社会保障を立て直す国民会議（2019年解散）",
+          "自由党〔2016〕（2019年国民民主党と合党）",
+          "維新の党（→民進党合流、2016年）",
+          "減税保守こども（2025〜26年の少数会派）",
+        ];
         const $section = $("#parties-note-block");
         $section.append('<h2><div class="icon info"></div>会派名について</h2>');
         $section.append('<div class="box sn-color"></div>');
-        $section.append('<p>「会派（政党）別の賛否」検索で使用する会派名は、衆議院公式データに記載された表記をそのまま使用しています。以下の会派は複数政党や無所属議員による合同会派です。</p>');
+        $section.append('<p>「会派（政党）別の賛否」検索の会派名は、衆議院公式データに記載された表記をそのまま使用しています。会派プルダウンは「現在の会派」「過去の会派」に分けています。</p>');
+        $section.append('<h4 style="margin-top:24px;font-size:15px;font-weight:bold">合同会派（複数政党・無所属を含む）</h4>');
         let html = '<ul style="margin-top:8px">';
-        names.forEach(n => { html += '<li style="font-size:14px;color:#555;padding:2px 0">' + n + '</li>'; });
+        Object.keys(COMPOSITE_INFO).sort((a, b) => a.localeCompare(b, "ja")).forEach(n => {
+          html += '<li style="font-size:13px;color:#555;padding:3px 0"><strong>' + n + '</strong>：' + COMPOSITE_INFO[n] + '</li>';
+        });
         html += '</ul>';
         $section.append(html);
+        $section.append('<h4 style="margin-top:24px;font-size:15px;font-weight:bold">消滅した単独政党・会派</h4>');
+        let html2 = '<ul style="margin-top:8px">';
+        DEFUNCT_SINGLE.forEach(n => { html2 += '<li style="font-size:13px;color:#888;padding:2px 0">' + n + '</li>'; });
+        html2 += '</ul>';
+        $section.append(html2);
+      }
+
+
+      const updateSelectBoxKaijiAnyYear = () => {
+        const years = {};
+        data.gian_summary.forEach(gian => {
+          gian[10].forEach(keika => {
+            const y = eraToYear(keika[9]) || eraToYear(keika[7]) || eraToYear(keika[18]) || eraToYear(keika[16]);
+            if (y) years[y] = true;
+          });
+        });
+        const $select = $("#select-kaiji-any-year");
+        Object.keys(years).map(y => parseInt(y, 10)).sort((a, b) => b - a).forEach(y => {
+          $select.append('<option value="' + y + '">' + y + '年</option>');
+        });
+      }
+
+      const updateSelectBoxHoreiYear = () => {
+        const years = {};
+        data.gian_summary.forEach(gian => {
+          gian[10].forEach(keika => {
+            const horei = keika[22];
+            if (!horei || horei.indexOf('／') === -1) return;
+            const y = eraToYear(horei.split('／')[0].trim());
+            if (y) years[y] = true;
+          });
+        });
+        const $select = $("#select-horei-year");
+        Object.keys(years).map(y => parseInt(y, 10)).sort((a, b) => b - a).forEach(y => {
+          $select.append('<option value="' + y + '">' + y + '年</option>');
+        });
+      }
+
+      const populateDatalistHoreiNumber = () => {
+        const nums = new Set();
+        data.gian_summary.forEach(gian => {
+          gian[10].forEach(keika => {
+            const horei = keika[22];
+            if (!horei || horei.indexOf('／') === -1) return;
+            const num = horei.split('／').slice(-1)[0].trim();
+            if (num && /^\d+$/.test(num)) nums.add(parseInt(num, 10));
+          });
+        });
+        const $dl = $("#datalist-horei-number");
+        Array.from(nums).sort((a, b) => a - b).forEach(n => {
+          $dl.append('<option value="' + n + '">');
+        });
+      }
+
+      const populateDatalistSession = () => {
+        const vals = new Set();
+        data.gian_summary.forEach(gian => { if (gian[1]) vals.add(gian[1]); });
+        const $dl = $("#datalist-gian-session");
+        Array.from(vals).map(v => parseInt(v, 10)).filter(n => !isNaN(n)).sort((a, b) => b - a).forEach(n => {
+          $dl.append('<option value="' + n + '">');
+        });
+      }
+
+      const populateDatalistNumber = () => {
+        const vals = new Set();
+        data.gian_summary.forEach(gian => { if (gian[2]) vals.add(gian[2]); });
+        const $dl = $("#datalist-gian-number");
+        Array.from(vals).map(v => parseInt(v, 10)).filter(n => !isNaN(n)).sort((a, b) => a - b).forEach(n => {
+          $dl.append('<option value="' + n + '">');
+        });
       }
 
       const updateKeywords = () => {
-        const KEYWORDS_NUM = Math.min(KEYWORDS.length, 6);
-        let copy = KEYWORDS.map(d => {
-          return d;
-        });
-        for (let i = 0; i < KEYWORDS_NUM; i++) {
-          const j = Math.floor(Math.random() * (KEYWORDS.length - i)); // Between 0 and (KEYWORDS_NUM - 1)
-          $("#keywords").append('<a href="">' + copy[j] + '</a>｜');
+        const FIXED = ["減税", "社会保険料", "規制"];
+        const RANDOM_NUM = 5;
+        let copy = KEYWORDS.filter(k => FIXED.indexOf(k) === -1);
+        const random = [];
+        for (let i = 0; i < Math.min(RANDOM_NUM, copy.length); i++) {
+          const j = Math.floor(Math.random() * copy.length);
+          random.push(copy[j]);
           copy.splice(j, 1);
         }
-
+        const selected = [...FIXED, ...random];
+        selected.forEach((kw, idx) => {
+          $("#keywords").append('<a href="">' + kw + '</a>' + (idx < selected.length - 1 ? '｜' : ''));
+        });
         $("#keywords").find("a").on("click", function(e){
           e.preventDefault();
           $("#input-gian-title").val($(this).text());
@@ -575,8 +685,13 @@ const init = () => {
       updateSelectBoxParties("select-party-against");
       updateSelectBoxSubmitterParties();
       updateSelectBoxKaiji();
+      updateSelectBoxKaijiAnyYear();
       updateSelectBoxCommittees();
       updateSelectBoxSubmitYears();
+      updateSelectBoxHoreiYear();
+      populateDatalistHoreiNumber();
+      populateDatalistSession();
+      populateDatalistNumber();
 
       showLatestStatus();
       showCommittees();
@@ -604,6 +719,7 @@ const init = () => {
         if (getP('kaiji-submit')) $("#select-kaiji-submit").val(getP('kaiji-submit'));
         if (getP('submit-year')) $("#select-submit-year").val(getP('submit-year'));
         if (getP('kaiji-any')) $("#select-kaiji-any").val(getP('kaiji-any'));
+        if (getP('kaiji-any-year')) $("#select-kaiji-any-year").val(getP('kaiji-any-year'));
         if (getP('shugiin-committee')) $("#select-shugiin-committee").val(getP('shugiin-committee'));
         if (getP('shugiin-shinsa')) $("#select-shugiin-shinsa").val(getP('shugiin-shinsa'));
         if (getP('shugiin-shingi')) $("#select-shugiin-shingi").val(getP('shugiin-shingi'));
@@ -613,7 +729,8 @@ const init = () => {
         if (getP('sangiin-committee')) $("#select-sangiin-committee").val(getP('sangiin-committee'));
         if (getP('sangiin-shinsa')) $("#select-sangiin-shinsa").val(getP('sangiin-shinsa'));
         if (getP('sangiin-shingi')) $("#select-sangiin-shingi").val(getP('sangiin-shingi'));
-        if (getP('horei')) $("#input-horei").val(getP('horei'));
+        if (getP('horei-year')) $("#select-horei-year").val(getP('horei-year'));
+        if (getP('horei-number')) $("#input-horei-number").val(getP('horei-number'));
         $("#switch").find('.switch-item[code="search"]').trigger('click');
         $("#form-gian-search").submit();
       }
@@ -808,6 +925,40 @@ const init = () => {
       return ERA_BASE[m[1]] + n;
     }
 
+    const matchSomeKeikaExact = (input, gian, getter) => {
+      if (input === "") return true;
+      return gian[10].some(keika => getter(keika).trim() === input);
+    }
+
+    const matchKaijiAnyYear = (input, gian) => {
+      if (input === "") return true;
+      const target = parseInt(input, 10);
+      return gian[10].some(keika => {
+        const y = eraToYear(keika[9]) || eraToYear(keika[7]) || eraToYear(keika[18]) || eraToYear(keika[16]);
+        return y === target;
+      });
+    }
+
+    const matchHoreiYear = (input, gian) => {
+      if (input === "") return true;
+      const target = parseInt(input, 10);
+      return gian[10].some(keika => {
+        const horei = keika[22];
+        if (!horei || horei.indexOf('／') === -1) return false;
+        return eraToYear(horei.split('／')[0].trim()) === target;
+      });
+    }
+
+    const matchHoreiNumber = (input, gian) => {
+      if (input === "") return true;
+      const target = input.trim();
+      return gian[10].some(keika => {
+        const horei = keika[22];
+        if (!horei || horei.indexOf('／') === -1) return false;
+        return horei.split('／').slice(-1)[0].trim() === target;
+      });
+    }
+
     const matchSubmitYear = (input, gian) => {
       if (input === "") return true;
       const target = parseInt(input, 10);
@@ -838,6 +989,7 @@ const init = () => {
       const party_a = $("#select-party-against").val();
       const kaijiSubmit = $("#select-kaiji-submit").val();
       const kaijiAny = $("#select-kaiji-any").val();
+      const kaijiAnyYear = $("#select-kaiji-any-year").val();
       const submitYear = $("#select-submit-year").val();
       const titleMode = $("input[name='title-mode']:checked").val();
       const shugiinCommittee = $("#select-shugiin-committee").val();
@@ -847,7 +999,8 @@ const init = () => {
       const sangiinCommittee = $("#select-sangiin-committee").val();
       const sangiinShinsa = $("#select-sangiin-shinsa").val();
       const sangiinShingi = $("#select-sangiin-shingi").val();
-      const horei = $("#input-horei").val();
+      const horeiYear = $("#select-horei-year").val();
+      const horeiNumber = $("#input-horei-number").val().trim();
       const MAX_RESULTS = 1000;
       gResults = [];
 
@@ -868,16 +1021,18 @@ const init = () => {
 
         if (kaijiSubmit !== "" && gian[1] !== kaijiSubmit) hit = false;
         if (!matchAnyKaiji(kaijiAny, gian)) hit = false;
+        if (!matchKaijiAnyYear(kaijiAnyYear, gian)) hit = false;
         if (!matchSubmitYear(submitYear, gian)) hit = false;
 
         if (!matchSomeKeika(shugiinCommittee, gian, (k) => normalizeCommittee(getAfterSlash(k[10])))) hit = false;
-        if (!matchSomeKeika(shugiinShinsa,    gian, (k) => getAfterSlash(k[11]))) hit = false;
-        if (!matchSomeKeika(shugiinShingi,    gian, (k) => getAfterSlash(k[12]))) hit = false;
+        if (!matchSomeKeikaExact(shugiinShinsa,    gian, (k) => getAfterSlash(k[11]))) hit = false;
+        if (!matchSomeKeikaExact(shugiinShingi,    gian, (k) => getAfterSlash(k[12]))) hit = false;
         if (!matchSomeKeika(shugiinTaido,     gian, (k) => k[13])) hit = false;
         if (!matchSomeKeika(sangiinCommittee, gian, (k) => normalizeCommittee(getAfterSlash(k[19])))) hit = false;
-        if (!matchSomeKeika(sangiinShinsa,    gian, (k) => getAfterSlash(k[20]))) hit = false;
-        if (!matchSomeKeika(sangiinShingi,    gian, (k) => getAfterSlash(k[21]))) hit = false;
-        if (!matchSomeKeika(horei,            gian, (k) => k[22])) hit = false;
+        if (!matchSomeKeikaExact(sangiinShinsa,    gian, (k) => getAfterSlash(k[20]))) hit = false;
+        if (!matchSomeKeikaExact(sangiinShingi,    gian, (k) => getAfterSlash(k[21]))) hit = false;
+        if (!matchHoreiYear(horeiYear, gian)) hit = false;
+        if (!matchHoreiNumber(horeiNumber, gian)) hit = false;
 
         gian[10].map(keika => {
           if (!matchParty(party_f, keika[14])) hit = false;
@@ -929,6 +1084,7 @@ const init = () => {
       setP('kaiji-submit', kaijiSubmit);
       setP('submit-year', submitYear);
       setP('kaiji-any', kaijiAny);
+      setP('kaiji-any-year', kaijiAnyYear);
       setP('shugiin-committee', shugiinCommittee);
       setP('shugiin-shinsa', shugiinShinsa);
       setP('shugiin-shingi', shugiinShingi);
@@ -938,7 +1094,8 @@ const init = () => {
       setP('sangiin-committee', sangiinCommittee);
       setP('sangiin-shinsa', sangiinShinsa);
       setP('sangiin-shingi', sangiinShingi);
-      setP('horei', horei);
+      setP('horei-year', horeiYear);
+      setP('horei-number', horeiNumber);
       const qs = qp.toString();
       history.pushState(null, '', qs ? '?' + qs : window.location.pathname);
 
