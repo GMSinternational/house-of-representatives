@@ -98,7 +98,7 @@
           </div>
           <div class="control">
             <div class="label">議案番号</div>
-            <span style="white-space:nowrap">第 <input type="text" id="input-gian-session" placeholder="例：213" style="width:88px;display:inline-block" /> 回国会 第 <input type="text" id="input-gian-number" placeholder="例：1" style="width:72px;display:inline-block" /> 号</span>
+            <span style="white-space:nowrap">第 <input type="text" id="input-gian-session" list="datalist-gian-session" placeholder="例：213" style="width:88px;display:inline-block" /><datalist id="datalist-gian-session"></datalist> 回国会 第 <input type="text" id="input-gian-number" list="datalist-gian-number" placeholder="例：1" style="width:72px;display:inline-block" /><datalist id="datalist-gian-number"></datalist> 号</span>
             <div class="control-note">種類と組み合わせて絞り込めます（例：第213回国会 閣法第1号なら、種類=閣法、第213回国会、第1号）。</div>
           </div>
           <div class="control">
@@ -150,6 +150,12 @@
             </select>
             <div class="control-note">継続審議などで複数の国会にまたがる議案は、いずれの国会でもヒットします。</div>
           </div>
+          <div class="control">
+            <div class="label">審議に関わった年（西暦）</div>
+            <select id="select-kaiji-any-year">
+              <option value="">指定なし</option>
+            </select>
+          </div>
 
           <h4 class="form-category">衆議院での審議</h4>
           <div class="control">
@@ -162,36 +168,39 @@
             <div class="label">衆議院の審査結果</div>
             <select id="select-shugiin-shinsa">
               <option value="">指定なし</option>
-              <option>可決</option>
-              <option>修正</option>
-              <option>否決</option>
-              <option>承認</option>
-              <option>承諾</option>
-              <option>一部批難</option>
-              <option>是認</option>
-              <option>異議がない</option>
-              <option>審査未了</option>
-              <option>撤回許可</option>
-              <option>撤回</option>
+              <optgroup label="可決・承認">
+                <option>可決</option><option>修正</option><option>併合修正</option>
+                <option>承認</option><option>承諾</option><option>是認</option>
+                <option>異議がない</option><option>一部批難</option><option>議決不要</option>
+                <option>中央労働委員会の裁定のとおり実施することを承認</option>
+              </optgroup>
+              <optgroup label="継続・未了">
+                <option>審査未了</option>
+              </optgroup>
+              <optgroup label="否決・廃案">
+                <option>否決</option><option>撤回許可</option><option>撤回</option>
+              </optgroup>
             </select>
           </div>
           <div class="control">
             <div class="label">衆議院の審議結果</div>
             <select id="select-shugiin-shingi">
               <option value="">指定なし</option>
-              <option>可決</option>
-              <option>修正</option>
-              <option>否決</option>
-              <option>承認</option>
-              <option>承諾</option>
-              <option>議決</option>
-              <option>是認</option>
-              <option>異議がない</option>
-              <option>同意</option>
-              <option>不同意</option>
-              <option>閉会中審査</option>
-              <option>審議未了</option>
-              <option>撤回承諾</option>
+              <optgroup label="可決・承認">
+                <option>可決</option><option>修正</option><option>併合修正</option>
+                <option>承認</option><option>承諾</option><option>議決</option>
+                <option>議決不要</option><option>是認</option><option>異議がない</option>
+                <option>同意</option><option>中央労働委員会の裁定のとおり実施することを承認</option>
+              </optgroup>
+              <optgroup label="継続・未了">
+                <option>閉会中審査</option><option>審議未了</option>
+                <option>未決</option><option>（中間報告聴取）</option>
+              </optgroup>
+              <optgroup label="否決・廃案">
+                <option>否決</option><option>不同意</option><option>撤回承諾</option>
+                <option>撤回許可</option>
+                <option>両院協議会協議委員議長から両院の意見が一致しない旨の報告</option>
+              </optgroup>
             </select>
           </div>
           <div class="control">
@@ -230,43 +239,53 @@
             <div class="label">参議院の審査結果</div>
             <select id="select-sangiin-shinsa">
               <option value="">指定なし</option>
-              <option>可決</option>
-              <option>修正</option>
-              <option>否決</option>
-              <option>承認</option>
-              <option>承諾</option>
-              <option>不承諾</option>
-              <option>不承認</option>
-              <option>審査未了</option>
-              <option>撤回</option>
+              <optgroup label="可決・承認">
+                <option>可決</option><option>修正</option><option>承認</option>
+                <option>承諾</option>
+                <option>中央労働委員会の裁定のとおり実施することを承認</option>
+              </optgroup>
+              <optgroup label="継続・未了">
+                <option>審査未了</option>
+              </optgroup>
+              <optgroup label="否決・廃案">
+                <option>否決</option><option>不承諾</option><option>不承認</option>
+                <option>撤回許可</option><option>撤回</option>
+              </optgroup>
             </select>
           </div>
           <div class="control">
             <div class="label">参議院の審議結果</div>
             <select id="select-sangiin-shingi">
               <option value="">指定なし</option>
-              <option>可決</option>
-              <option>修正</option>
-              <option>否決</option>
-              <option>承認</option>
-              <option>承諾</option>
-              <option>不承諾</option>
-              <option>不承認</option>
-              <option>閉会中審査</option>
-              <option>省略決定</option>
-              <option>審議未了</option>
-              <option>同意</option>
-              <option>不同意</option>
-              <option>議決不要</option>
-              <option>撤回</option>
+              <optgroup label="可決・承認">
+                <option>可決</option><option>修正</option><option>承認</option>
+                <option>承諾</option><option>同意</option><option>議決不要</option>
+                <option>中央労働委員会の裁定のとおり実施することを承認</option>
+              </optgroup>
+              <optgroup label="継続・未了">
+                <option>閉会中審査</option><option>省略決定</option>
+                <option>審議未了</option><option>（中間報告聴取）</option>
+              </optgroup>
+              <optgroup label="否決・廃案">
+                <option>否決</option><option>不承諾</option><option>不承認</option>
+                <option>不同意</option><option>撤回</option>
+              </optgroup>
             </select>
           </div>
 
           <h4 class="form-category">その他</h4>
           <div class="control">
-            <div class="label">公布年月日／法律番号</div>
-            <input type="text" id="input-horei" placeholder="例：令和6年、67（法律第67号の場合）" />
-            <div class="control-note">成立して法律として公布された議案が対象です。日付は元号表記、番号は数字のみで検索してください。</div>
+            <div class="label">公布年</div>
+            <select id="select-horei-year">
+              <option value="">指定なし</option>
+            </select>
+            <div class="control-note">成立して法律として公布された議案が対象です。</div>
+          </div>
+          <div class="control">
+            <div class="label">法律番号</div>
+            <input type="text" id="input-horei-number" list="datalist-horei-number" placeholder="例：67" style="width:100px" />
+            <datalist id="datalist-horei-number"></datalist>
+            <div class="control-note">法律番号（数字）で検索します。例：法律第67号なら「67」。</div>
           </div>
 
           <div class="control">
