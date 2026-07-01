@@ -559,6 +559,12 @@ body {
     }
   }
 
+  #parties-note-block {
+    width: calc(100% - 32px);
+    max-width: 960px;
+    margin: 64px auto 0;
+  }
+
   #footer-block {
     margin: 0 auto;
     margin-top: 64px;
