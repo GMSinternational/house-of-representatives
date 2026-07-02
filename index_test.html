@@ -98,7 +98,7 @@
           </div>
           <div class="control">
             <div class="label">議案番号</div>
-            <span style="white-space:nowrap">第 <input type="text" id="input-gian-session" list="datalist-gian-session" placeholder="213" style="width:88px;display:inline-block" /><datalist id="datalist-gian-session"></datalist> 回国会 第 <input type="text" id="input-gian-number" list="datalist-gian-number" placeholder="1" style="width:72px;display:inline-block" /><datalist id="datalist-gian-number"></datalist> 号</span>
+            <span style="white-space:nowrap">第 <select id="select-gian-session" style="width:108px;display:inline-block"><option value="">指定なし</option></select> 回国会 第 <select id="select-gian-number" style="width:88px;display:inline-block"><option value="">指定なし</option></select> 号</span>
             <div class="control-note">種類と組み合わせて絞り込めます（例：第213回国会 閣法第1号なら、種類=閣法、第213回国会、第1号）。</div>
           </div>
           <div class="control">
@@ -283,8 +283,7 @@
           </div>
           <div class="control">
             <div class="label">法律番号</div>
-            <input type="text" id="input-horei-number" list="datalist-horei-number" placeholder="67" style="width:100px" />
-            <datalist id="datalist-horei-number"></datalist>
+            <select id="select-horei-number"><option value="">指定なし</option></select>
             <div class="control-note">法律番号（数字）で検索します。例：法律第67号なら「67」。</div>
           </div>
 

@@ -624,7 +624,7 @@ const init = () => {
         });
       }
 
-      const populateDatalistHoreiNumber = () => {
+      const updateSelectBoxHoreiNumber = () => {
         const nums = new Set();
         data.gian_summary.forEach(gian => {
           gian[10].forEach(keika => {
@@ -634,27 +634,27 @@ const init = () => {
             if (num && /^\d+$/.test(num)) nums.add(parseInt(num, 10));
           });
         });
-        const $dl = $("#datalist-horei-number");
+        const $sel = $("#select-horei-number");
         Array.from(nums).sort((a, b) => a - b).forEach(n => {
-          $dl.append('<option value="' + n + '">');
+          $sel.append('<option value="' + n + '">' + n + '</option>');
         });
       }
 
-      const populateDatalistSession = () => {
+      const updateSelectBoxGianSession = () => {
         const vals = new Set();
         data.gian_summary.forEach(gian => { if (gian[1]) vals.add(gian[1]); });
-        const $dl = $("#datalist-gian-session");
+        const $sel = $("#select-gian-session");
         Array.from(vals).map(v => parseInt(v, 10)).filter(n => !isNaN(n)).sort((a, b) => b - a).forEach(n => {
-          $dl.append('<option value="' + n + '">');
+          $sel.append('<option value="' + n + '">' + n + '</option>');
         });
       }
 
-      const populateDatalistNumber = () => {
+      const updateSelectBoxGianNumber = () => {
         const vals = new Set();
         data.gian_summary.forEach(gian => { if (gian[2]) vals.add(gian[2]); });
-        const $dl = $("#datalist-gian-number");
+        const $sel = $("#select-gian-number");
         Array.from(vals).map(v => parseInt(v, 10)).filter(n => !isNaN(n)).sort((a, b) => a - b).forEach(n => {
-          $dl.append('<option value="' + n + '">');
+          $sel.append('<option value="' + n + '">' + n + '</option>');
         });
       }
 
@@ -689,9 +689,9 @@ const init = () => {
       updateSelectBoxCommittees();
       updateSelectBoxSubmitYears();
       updateSelectBoxHoreiYear();
-      populateDatalistHoreiNumber();
-      populateDatalistSession();
-      populateDatalistNumber();
+      updateSelectBoxHoreiNumber();
+      updateSelectBoxGianSession();
+      updateSelectBoxGianNumber();
 
       showLatestStatus();
       showCommittees();
@@ -708,8 +708,8 @@ const init = () => {
       if (urlParams.toString() !== '') {
         const getP = (key) => urlParams.get(key) || '';
         if (getP('title')) $("#input-gian-title").val(getP('title'));
-        if (getP('session')) $("#input-gian-session").val(getP('session'));
-        if (getP('number')) $("#input-gian-number").val(getP('number'));
+        if (getP('session')) $("#select-gian-session").val(getP('session'));
+        if (getP('number')) $("#select-gian-number").val(getP('number'));
         if (getP('title-mode') === 'or') $("input[name='title-mode'][value='or']").prop('checked', true);
         if (getP('type')) $("#select-gian-type").val(getP('type'));
         if (getP('status')) $("#select-gian-status").val(getP('status'));
@@ -730,7 +730,7 @@ const init = () => {
         if (getP('sangiin-shinsa')) $("#select-sangiin-shinsa").val(getP('sangiin-shinsa'));
         if (getP('sangiin-shingi')) $("#select-sangiin-shingi").val(getP('sangiin-shingi'));
         if (getP('horei-year')) $("#select-horei-year").val(getP('horei-year'));
-        if (getP('horei-number')) $("#input-horei-number").val(getP('horei-number'));
+        if (getP('horei-number')) $("#select-horei-number").val(getP('horei-number'));
         $("#switch").find('.switch-item[code="search"]').trigger('click');
         $("#form-gian-search").submit();
       }
@@ -980,8 +980,8 @@ const init = () => {
       if (type   === "指定なし") type   = "";
       if (status === "指定なし") status = "";
       const title = $("#input-gian-title").val();
-      const gianSession = $("#input-gian-session").val().trim();
-      const gianNumber = $("#input-gian-number").val().trim();
+      const gianSession = $("#select-gian-session").val();
+      const gianNumber = $("#select-gian-number").val();
       const submitter = $("#input-gian-submitter").val();
       const submitterParty = $("#select-gian-submitter-party").val();
       const submitterKind = $("#select-submitter-kind").val();
@@ -1000,7 +1000,7 @@ const init = () => {
       const sangiinShinsa = $("#select-sangiin-shinsa").val();
       const sangiinShingi = $("#select-sangiin-shingi").val();
       const horeiYear = $("#select-horei-year").val();
-      const horeiNumber = $("#input-horei-number").val().trim();
+      const horeiNumber = $("#select-horei-number").val();
       const MAX_RESULTS = 1000;
       gResults = [];
 
