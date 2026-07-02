@@ -52,7 +52,8 @@ body input:focus, body textarea:focus, body select:focus {
     box-shadow: 0px 0px 4px rgba(39, 153, 176, 0.3);
   }
 }
-body select {
+body select,
+body input[list] {
   appearance: none;
   background-image: url(../img/material-icon-arrow-down.svg);
   background-repeat: no-repeat;
