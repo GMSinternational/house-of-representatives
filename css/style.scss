@@ -69,8 +69,7 @@ body {
     }
   }
 
-  select,
-  input[list] {
+  select {
     appearance: none;
     background-image: url(../img/material-icon-arrow-down.svg);
     background-repeat: no-repeat;
